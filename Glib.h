@@ -14,10 +14,15 @@
 const int OnlyCoutPos = 900;
 const int WorkWithXY = 901;
 const int DrawInvisibleSpace = 902;
+const int UpWindow = 903;
 const int NONE = 404;
 const int GRectangle = 801;
 const int GLine = 802;
+const int CLICK = 1700;
 int StartButtonPress = 0;
+int Button[100000];
+using Start=int;
+
 
       class Glib
  {
@@ -34,9 +39,8 @@ int StartButtonPress = 0;
      GC *GraphContextClass;
      Colormap *cMapClass;
      int *DefScree;
-     char fontname[];
-     
-     
+     int ButtonPoint[10000];
+     char fontname[128];
      
  void SetColor(int r, int g, int b) {
      Color.flags = DoRed | DoGreen | DoBlue;
@@ -108,10 +112,6 @@ Display* OpenDisplay( const char* name) {
      INTs = XDefaultScreen(d);
  }
  
- void NEvent() {
-     
- }
- 
  void CurrentPointerPressPos(XEvent e, int &x, int &y, int FunctionMode) {
   if(StartButtonPress == 1) {
      xC = e.xbutton.x;
@@ -124,26 +124,45 @@ Display* OpenDisplay( const char* name) {
      else if(FunctionMode == 901) {
          x = xC;
          y = yC;
-         std::cout << "x = " << xC << std::endl;
-         std::cout << "y = " << yC << std::endl;
+      std::cout << "x = " << xC << std::endl;
+      std::cout << "y = " << yC << std::endl;
      }
    }
  }
  
  int CliInThisRectangle(Display *d , XEvent e ,int x1, int y1, int x2, int y2 ,int ModeFunction, int WhatReturnIfTrue, int WhatReturnIfFalse)
  {
-          int xInFunc = 0; int yInFunc = 0;
+ int xInFunc = 0; int yInFunc = 0;
      if(ModeFunction == DrawInvisibleSpace)
      {
-        XFillRectangle(d, *wClass, *GraphContextClass, x1, y1, x2-25 , y2-25);
+        XFillRectangle(d, *wClass, *GraphContextClass, x1, y1, x2-x1 , y2-y1);
      }
+        CurrentPointerPressPos(e, xInFunc, yInFunc, WorkWithXY);
+     if(xInFunc >= x1 && xInFunc <= x2 && yInFunc >= y1 && yInFunc <= y2) {return WhatReturnIfTrue; std::cout << "123\n"; if(ModeFunction == UpWindow)
+                                                                           {UpdateWindow(d,*wClass,e);}                                                  }
+     else {return WhatReturnIfFalse;}
+     return WhatReturnIfFalse;
+ }
+ 
+};
+
+class GButton : protected Glib
+{
+    
+public:
+    int ButtonTF;
+    int ButtonTrue;
+    int ButtonFalse;
+ void CreateButton(Display *d, Window w, GC gc2 , XEvent e ,int x1, int y1, int x2, int y2 ,int ModeFunction, int WhatReturnIfTrue, int WhatReturnIfFalse)
+ {
+  int xInFunc = 0; int yInFunc = 0;
+     XFillRectangle(d, w, gc2, x1, y1, x2-x1 , y2-y1);
      CurrentPointerPressPos(e, xInFunc, yInFunc, WorkWithXY);
      
-     if(xInFunc >= x1 && xInFunc <= x2 && yInFunc >= y1 && yInFunc <= y2) {return WhatReturnIfTrue;}
-     else {return WhatReturnIfFalse;}
-     
-     
-     return -1;
+     if(xInFunc >= x1 && xInFunc <= x2 && yInFunc >= y1 && yInFunc <= y2) {ButtonTrue = WhatReturnIfTrue; ButtonTF = WhatReturnIfTrue; if(ModeFunction == UpWindow)
+                                                                          {UpdateWindow(d,w,e);}                                      }
+  else {ButtonFalse = WhatReturnIfFalse; ButtonTF = WhatReturnIfFalse;}
+
  }
 };
  
