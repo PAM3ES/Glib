@@ -16,60 +16,56 @@
    XEvent e;
    GC gc;
    Colormap cmap;
-   std::string texttofunction;
+std::string texttofunction;
    Glib object;
    GButton b12;
+   int Money = 1000;
    int s;
    int x,y;
-   int Money = 1000;
-
-   
+   int n1 = 0;
+///////////////////////////////////////////////
    d = object.OpenDisplay("display");
     object.DefScreen(d,s);
    gc = XDefaultGC(d,s);
     cmap = XDefaultColormap(d,s);
+    
    w = XCreateSimpleWindow(d, RootWindow(d, s), 10, 10, 950, 600, 1,
-                                 XBlackPixel(d, s),  XWhitePixel(d,s));
-    object.DeclaringVariables(w,gc,cmap,s);
-
-   XSelectInput(d, w, ExposureMask | KeyPressMask|KeyReleaseMask|FocusChangeMask 
-                | ButtonPressMask );
+                             XBlackPixel(d, s),  XWhitePixel(d,s));
+   object.DeclaringVariables(w,gc,cmap,s);
+   XSelectInput(d, w, ExposureMask | KeyPressMask|KeyReleaseMask
+                            |FocusChangeMask | ButtonPressMask );
    
 XMapWindow(d, w);
 
-   while (1) {
+while (1) {
 XNextEvent(d, &e);
-switch (e.type)
-{
+
+switch (e.type) {
     
-case ButtonPress:
-{
+case ButtonPress: {
     StartButtonPress = 1;
 
     object.UpdateWindow(d,w,e);
-        object.CurrentPointerPressPos(e,x,y,OnlyCoutPos);
-Button[1] = object.CliInThisRectangle(d,e, 0,0, 39,33, UpWindow , CLICK,2);
-
+    object.CurrentPointerPressPos(e,x,y,OnlyCoutPos);
 break;
-}
-case Expose:
-{
+    }
+case Expose: {
          std::cout << "Expose\n";
-         object.SetColor(65500,0,0);
-                 b12.CreateButton(d,w,XDefaultGC(d,s),e, 130,130, 150,150, UpWindow , CLICK,2);
-            if(Button[1] == CLICK) {FunctionForDrawText(d,w,s, Money,4,50,50);}
-            if(b12.ButtonTF == CLICK) {FunctionForDrawText(d,w,s, Money,4,125,125);}
-object.DrawItem(d,w, GLine , 0,32, 10000 ,32);
-object.DrawText(d,w,DefaultGC(d,s), "Gold" , 4 , 10 , 15  , DefaultColormap(d,s));
-object.DrawText(d,w,DefaultGC(d,s), "Money", 5 , 50 , 15  , DefaultColormap(d,s));
-object.DrawText(d,w,DefaultGC(d,s), "Expensive fossils", 17 , 95 , 15  , DefaultColormap(d,s));
+         b12.NewButton(gc,cmap);
+         b12.SetColorB(d,0,0,65500);
+        b12.CreateButton(d,w,XDefaultGC(d,s),e, 435,275 , 550,305, UpWindow, CLICK,2);
+        if(b12.ButtonTF == CLICK) {n1++; std::cout << n1 << std::endl; FunctionForDrawText(d,w,s, Money,4,125,125);}
+        
 
+    object.DrawItem(d,w,65500,0,0,GNFRectangle, 325,150,325,45);
+    object.DrawItem(d,w,0,65500,0,GNFRectangle, 325,215,325,45);
+    object.DrawItem(d,w,0,0,65500,GArc,100,100,50,50,64*180,64*180);
     XFlush(d);
 break;
-  }    
- }
+    }    
+  }
 }
   /* Закрыть соединение с X сервером */
-   XCloseDisplay(d);
-   return 0;
- }
+XCloseDisplay(d);
+return 0;
+}
